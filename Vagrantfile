@@ -28,8 +28,7 @@ Vagrant.configure('2') do |config|
   config.vm.network :public_network, ip: $VmIp				
 
   config.vm.provision :ansible_local do |ansible|
-    #ansible.playbook = 'playbook.yml'
-	ansible.playbook = 'phpupdate.yml'
+    ansible.playbook = 'playbook.yml'
   end
 end
   
