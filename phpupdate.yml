@@ -1,0 +1,35 @@
+---
+- hosts: all
+  become: yes
+  become_method: sudo
+  
+  tasks:        
+    - name: Install PHP7.2
+      apt:
+        pkg:
+        - php7.2
+        - php7.2-common
+        - php7.2-cli
+        - php7.2-curl
+        - php7.2-json
+        - php7.2-gd
+        - php7.2-mbstring
+        - php7.2-intl
+        - php7.2-bcmath
+        - php7.2-bz2
+        - php7.2-readline
+        - php7.2-zip
+        state: present
+
+    - name: Reconfigure Apache2
+      shell: a2dismod php5.6 ; a2enmod php7.2
+      notify: restart web-server
+      
+  handlers:
+    - name: restart web-server
+      service: 
+        name: "{{ item }}"
+        state: restarted
+      loop:
+        - apache2
+        - nginx

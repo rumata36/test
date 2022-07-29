@@ -1,0 +1,47 @@
+---
+- hosts: all
+  become: yes
+  become_method: sudo
+
+  tasks:        
+    - name: Install GnuPG for packages.sury.org/php/apt.gpg
+      apt: name=gnupg state=present
+      
+    - name: Add packages.sury.org apt key for PHP 5.6.
+      apt_key: url=https://packages.sury.org/php/apt.gpg id=15058500A0235D97F5D10063B188E2B695BD4743 state=present
+
+    - name: Add packages.sury.org repo for PHP 5.6.
+      apt_repository: repo="deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main" state=present
+      register: php_sury_repo
+
+    - name: Update Rep cache
+      apt: update_cache=true cache_valid_time=3600 force_apt_get=true
+  
+    - name: Install Vim
+      apt: name=vim state=present
+   
+    - name: install Wget
+      apt: name=wget state=present
+
+    - name: install Htop
+      apt: name=htop state=present
+
+    - name: install Tmux
+      apt: name=tmux state=present
+
+    - name: Install PHP 5.6
+      apt: name=php5.6 state=present
+
+    - name: apache2 listen on port 8888
+      lineinfile: dest=/etc/apache2/ports.conf regexp="^Listen 80" line="Listen 8888" state=present
+      notify: restart apache2
+    
+    - name: install Nginx
+      apt: name=nginx state=latest
+      notify: start nginx
+      
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=restarted
+    - name: start nginx
+      service: name=nginx state=started enabled=yes
